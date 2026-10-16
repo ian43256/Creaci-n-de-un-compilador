@@ -1,3 +1,7 @@
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import javax.swing.JFileChooser;
 public class AutomataFuncionJava {
 
     static final int E = -1;
@@ -160,4 +164,57 @@ public class AutomataFuncionJava {
         if (c == '\r') return "\\r";
         return String.valueOf(c);
     }
+    
+    public static File seleccionarArchivo() {
+        JFileChooser selector = new JFileChooser();
+        selector.setDialogTitle("Seleccione un archivo");
+        int resultado = selector.showOpenDialog(null);
+
+        if (resultado == JFileChooser.APPROVE_OPTION) {
+            return selector.getSelectedFile();
+        }
+        return null;
+    }
+
+    public static String leerContenidoTexto(File archivo) {
+        try {
+            return Files.readString(archivo.toPath());
+        } catch (IOException e) {
+            System.out.println(
+                    "Aviso: el archivo no pudo leerse como texto plano ("
+                            + e.getMessage() + ")."
+            );
+            return null;
+        }
+    }
+
+    public static void main(String[] args) {
+        File archivo = seleccionarArchivo();
+
+        if (archivo == null) {
+            System.out.println("No se seleccionÃ³ ningÃºn archivo.");
+            return;
+        }
+
+        String contenido = leerContenidoTexto(archivo);
+
+        if (contenido == null) {
+            return;
+        }
+
+        System.out.println("Archivo: " + archivo.getName());
+        System.out.println("Contenido leÃ­do:");
+        System.out.println(contenido);
+        System.out.println("-------------------------------------------");
+
+        String error = validar(contenido);
+
+        if (error == null) {
+            System.out.println("Resultado: SÃ es una funciÃ³n vÃ¡lida en Java (el autÃ³mata llegÃ³ a q7).");
+        } else {
+            System.out.println("Resultado: NO es una funciÃ³n vÃ¡lida en Java.");
+            System.out.println("Motivo: " + error);
+        }
+    }
 }
+
