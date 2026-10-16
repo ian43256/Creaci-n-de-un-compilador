@@ -11,6 +11,7 @@
     ASTNode* crear_nodo_numero(int v);
     ASTNode* crear_nodo_operacion(NodeType t, ASTNode* i, ASTNode* d);
     void imprimir_arbol(ASTNode* nodo, int nivel);
+    void exportar_dot(ASTNode* raiz, const char* archivo);
     void liberar_arbol(ASTNode* nodo);
 }
 
@@ -87,6 +88,52 @@ void imprimir_arbol(ASTNode* nodo, int nivel) {
         imprimir_arbol(nodo->izq, nivel + 1);
         imprimir_arbol(nodo->der, nivel + 1);
     }
+}
+
+static int contador_id = 0;
+
+static int dot_nodo(ASTNode* n, FILE* f) {
+    int id = contador_id++;
+
+    if (n->tipo == N_NUMERO) {
+        fprintf(f, "  n%d [label=\"%d\", shape=box, style=filled, fillcolor=\"#cfe8ff\"];\n",
+                id, n->valor);
+    } else {
+        const char* op = "?";
+        switch (n->tipo) {
+            case N_SUMA:  op = "+"; break;
+            case N_RESTA: op = "-"; break;
+            case N_MULT:  op = "*"; break;
+            case N_DIV:   op = "/"; break;
+            default: break;
+        }
+        fprintf(f, "  n%d [label=\"%s\", shape=circle, style=filled, fillcolor=\"#ffe3b3\"];\n",
+                id, op);
+
+        if (n->izq) {
+            int h = dot_nodo(n->izq, f);
+            fprintf(f, "  n%d -> n%d;\n", id, h);
+        }
+        if (n->der) {
+            int h = dot_nodo(n->der, f);
+            fprintf(f, "  n%d -> n%d;\n", id, h);
+        }
+    }
+    return id;
+}
+
+void exportar_dot(ASTNode* raiz, const char* archivo) {
+    FILE* f = fopen(archivo, "w");
+    if (f == NULL) {
+        fprintf(stderr, "No se pudo crear %s\n", archivo);
+        return;
+    }
+    contador_id = 0;
+    fprintf(f, "digraph AST {\n");
+    fprintf(f, "  node [fontname=\"Arial\", fontsize=14];\n");
+    if (raiz != NULL) dot_nodo(raiz, f);
+    fprintf(f, "}\n");
+    fclose(f);
 }
 
 void liberar_arbol(ASTNode* nodo) {
