@@ -3,8 +3,9 @@ project(ast_bison C)
 
 set(CMAKE_C_STANDARD 11)
 
-set(BISON_EXECUTABLE "C:/msys64/usr/bin/bison.exe")
-set(FLEX_EXECUTABLE "C:/msys64/usr/bin/flex.exe")
+if(WIN32)
+    list(APPEND CMAKE_PROGRAM_PATH "C:/msys64/usr/bin" "C:/winflexbison")
+endif()
 
 find_package(BISON REQUIRED)
 find_package(FLEX REQUIRED)
