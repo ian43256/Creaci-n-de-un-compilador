@@ -1,0 +1,3 @@
+int edad = 20;
+if edad return valor;
+float promedio;
