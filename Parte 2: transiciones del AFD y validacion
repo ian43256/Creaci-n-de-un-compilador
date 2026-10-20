@@ -1,0 +1,105 @@
+java
+    static int siguienteEstado(int estado, char c) {
+        switch (estado) {
+
+            case Q0:
+                if (c == 'v') return V1;
+                if (esEspacio(c)) return Q0;
+                return E;
+
+            case V1:
+                return (c == 'o') ? V2 : E;
+
+            case V2:
+                return (c == 'i') ? V3 : E;
+
+            case V3:
+                return (c == 'd') ? Q1 : E;
+
+            case Q1:
+                return esEspacio(c) ? Q2 : E;
+
+            case Q2:
+                if (esEspacio(c)) return Q2;
+                if (esInicioNombre(c)) return Q3;
+                return E;
+
+            case Q3:
+                if (esParteNombre(c)) return Q3;
+                if (esEspacio(c)) return Q3B;
+                if (c == '(') return Q4;
+                return E;
+
+            case Q3B:
+                if (esEspacio(c)) return Q3B;
+                if (c == '(') return Q4;
+                return E;
+
+            case Q4:
+                return (c == ')') ? Q5 : Q4;
+
+            case Q5:
+                if (esEspacio(c)) return Q5;
+                if (c == '{') return Q6;
+                return E;
+
+            case Q6:
+                return (c == '}') ? Q7 : Q6;
+
+            case Q7:
+                return esEspacio(c) ? Q7 : E;
+
+            default:
+                return E;
+        }
+    }
+
+    public static String validar(String texto) {
+        int estado = Q0;
+        int profundidad = 0;
+        int linea = 1, columna = 0;
+
+        for (int i = 0; i < texto.length(); i++) {
+            char c = texto.charAt(i);
+
+            if (c == '\n') {
+                linea++;
+                columna = 0;
+            } else {
+                columna++;
+            }
+
+            if (estado == Q6) {
+                if (c == '{') {
+                    profundidad++;
+                    continue;
+                }
+                if (c == '}' && profundidad > 0) {
+                    profundidad--;
+                    continue;
+                }
+            }
+
+            int siguiente = siguienteEstado(estado, c);
+
+            if (siguiente == E) {
+                return "Línea " + linea + ", columna " + columna
+                        + ": carácter inesperado '" + visible(c) + "' en el estado "
+                        + NOMBRE_ESTADO[estado] + ". Se esperaba " + ESPERADO[estado] + ".";
+            }
+            estado = siguiente;
+        }
+
+        if (estado != Q7) {
+            return "El archivo terminó en el estado " + NOMBRE_ESTADO[estado]
+                    + " (no es de aceptación). Se esperaba " + ESPERADO[estado] + ".";
+        }
+        return null;
+    }
+
+    static String visible(char c) {
+        if (c == '\n') return "\\n";
+        if (c == '\t') return "\\t";
+        if (c == '\r') return "\\r";
+        return String.valueOf(c);
+    }
