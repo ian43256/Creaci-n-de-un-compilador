@@ -12,7 +12,7 @@ int main(void) {
         imprimir_arbol(raiz, 0);
 
         exportar_dot(raiz, "arbol.dot");
-        int r = system("dot -Tpng arbol.dot -o arbol.png");
+        int r = system("\"C:\\Program Files (x86)\\Graphviz\\bin\\dot.exe\" -Tpng arbol.dot -o arbol.png");
         if (r == 0) {
             printf("\nImagen generada: arbol.png\n");
         } else {
