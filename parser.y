@@ -1,3 +1,4 @@
+c
 %code requires {
     typedef enum { N_NUMERO, N_SUMA, N_RESTA, N_MULT, N_DIV } NodeType;
 
@@ -24,6 +25,8 @@ void yyerror(const char *s);
 
 ASTNode* raiz = NULL;
 }
+
+%define parse.error verbose
 
 %union {
     int val_int;
@@ -90,6 +93,7 @@ void imprimir_arbol(ASTNode* nodo, int nivel) {
     }
 }
 
+/* ---------- Exportar el arbol a formato DOT (Graphviz) ---------- */
 static int contador_id = 0;
 
 static int dot_nodo(ASTNode* n, FILE* f) {
